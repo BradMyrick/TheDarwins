@@ -2,6 +2,7 @@
 pragma solidity ^0.8.9;
 
 import "./ERC721A.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
@@ -28,21 +29,23 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
     /** @dev Address of the Evolution Rex contract */
     address public evolutionRexContract;
     address public multiSig;
-    /** @dev mapping of used evolution rex tokens */
-    mapping(uint256 => bool) public usedEvolutionRexTokens;
 
+    /** @dev BitVector to track used Evolution Rex tokens */
+    mapping(uint256 => uint256) public usedEvolutionRexTokens;
 
     modifier onlyMultiSig() {
         require(msg.sender == multiSig, "Only multisig");
         _;
     }
     constructor(uint256 maxSupply_ , address evolutionRexContract_, address multiSig_) ERC721A("TheDarwins", "DRWN") {
+        require(evolutionRexContract_ != address(0), "Evolution Rex contract address cannot be zero");
+        require(multiSig_ != address(0), "MultiSig address cannot be zero");
         maxSupply = maxSupply_;
         evolutionRexContract = evolutionRexContract_;
         multiSig = multiSig_;
         _mintERC2309(msg.sender, 679); // Darwins 1 - 679 are reserved for giveaways
     }
-
+    
     function _startTokenId() internal view virtual override returns (uint256) {
         return 1;
     }
@@ -62,7 +65,7 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
 
         unchecked {
             require(msg.value == quantity * pricePerMint, "Insufficient funds to mint");
-            _setAux(msg.sender, _getAux(msg.sender) + quantity);
+            uint64(_getAux(msg.sender)) + quantity;
         }
 
         _mint(msg.sender, quantity);
@@ -94,6 +97,8 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
     }
 
     function withdraw(address withdrawLocation) external onlyMultiSig {
+        require(withdrawLocation != address(0), "Withdraw location address cannot be zero");
+
         uint256 balance = address(this).balance;
 
         (bool success, ) = payable(withdrawLocation).call{value: balance}("");
@@ -107,12 +112,12 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
     }
 
     // Estimate gas required for minting Darwins
-    function estimateGasForMint(uint256 quantity) public view returns (uint256) {
+    function estimateGasForMint(uint256 quantity) public pure returns (uint256) {
         return gasEstimateForMint(quantity);
     }
 
     // Internal function for gas estimation
-    function gasEstimateForMint(uint256 quantity) internal view returns (uint256) {
+    function gasEstimateForMint(uint256 quantity) internal  pure returns (uint256) {
         uint256 gasUsage = 25000; // Base gas usage for minting
         gasUsage += quantity * 30000; // Additional gas per minted token
         return gasUsage;
@@ -124,7 +129,7 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         uint256 ts = totalSupply();
         require(ts < maxSupply, "Max supply reached");
 
-        for (uint256 i; i < tokenIds.length; i++) {
+        for (uint256 i = 0; i < tokenIds.length; i++) {
             uint256 tokenId = tokenIds[i];
             if (tokenId > 0 && tokenId <= maxSupply && !isEvolutionRexTokenUsed(tokenId)) {
                 require(IERC721(evolutionRexContract).ownerOf(tokenId) == msg.sender, "Sender does not own token");
@@ -150,5 +155,4 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         usedEvolutionRexTokens[wordIndex] |= (1 << bitIndex);
     }
 
-    // 
 }
