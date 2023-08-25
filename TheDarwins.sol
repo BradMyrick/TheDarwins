@@ -27,13 +27,20 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
 
     /** @dev Address of the Evolution Rex contract */
     address public evolutionRexContract;
-
+    address public multiSig;
     /** @dev mapping of used evolution rex tokens */
     mapping(uint256 => bool) public usedEvolutionRexTokens;
 
-    constructor(uint256 maxSupply_) ERC721A("TheDarwins", "DWNS") {
+
+    modifier onlyMultiSig() {
+        require(msg.sender == multiSig, "Only multisig");
+        _;
+    }
+    constructor(uint256 maxSupply_ , address evolutionRexContract_, address multiSig_) ERC721A("TheDarwins", "DRWN") {
         maxSupply = maxSupply_;
-        _mintERC2309(msg.sender, 679); // Darwin 1 - 679 are reserved for giveaways
+        evolutionRexContract = evolutionRexContract_;
+        multiSig = multiSig_;
+        _mintERC2309(msg.sender, 679); // Darwins 1 - 679 are reserved for giveaways
     }
 
     function _startTokenId() internal view virtual override returns (uint256) {
@@ -86,10 +93,10 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         pricePerMint = price;
     }
 
-    function withdraw() external onlyOwner {
+    function withdraw(address withdrawLocation) external onlyMultiSig {
         uint256 balance = address(this).balance;
 
-        (bool success, ) = payable(owner()).call{value: balance}("");
+        (bool success, ) = payable(withdrawLocation).call{value: balance}("");
         require(success, "withdraw failed");
     }
 
@@ -142,4 +149,6 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         uint256 bitIndex = tokenId % 256;
         usedEvolutionRexTokens[wordIndex] |= (1 << bitIndex);
     }
+
+    // 
 }

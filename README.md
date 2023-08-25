@@ -16,7 +16,7 @@ utilizing the ERC721A base standard.
 
 - **Base Contract**: This contract is based on the ERC721A standard, which includes batch minting functionality.
 
-- **Access Control**: Certain functions are restricted to the contract owner (`safewallet multisig`).
+- **Access Control**: Certain functions are restricted to the contract owner (`kodr.eth`).
 
 - **Reentrancy Protection**: The contract uses ReentrancyGuard to prevent reentrancy attacks.
 
@@ -44,7 +44,11 @@ To estimate the gas required for minting Darwins NFT tokens, you can use the `es
 
 ## Ownership and Control
 
-The contract owner has the ability to manage and configure the contract parameters. Ownership of the contract is our multisig wallet `safewallet`.
+The contract owner has the ability to manage and configure the contract parameters. Ownership of the contract is `kodr.eth`.
+
+## Withdrawal
+
+Only the multisig wallet can withdraw ETH from the contract using the `withdraw` function. see `SafeWallet` contract for details.
 
 ## License
 
