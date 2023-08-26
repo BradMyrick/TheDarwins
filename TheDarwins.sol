@@ -23,12 +23,13 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
     bool public publicMintAvailable = false;
     uint256 public maxPerWallet = 25;
     uint256 public pricePerMint;
-    uint256 public immutable maxSupply;
+    uint256 public immutable maxSupply = 10000;
     uint256 public constant BATCH_SIZE = 20;
 
     /** @dev Address of the Evolution Rex contract */
-    address public evolutionRexContract;
-    address public multiSig;
+    
+    address public constant evolutionRexContract = 0x0D01Eaf7b57d95CC4DAF73A99b7916752aa6Fe15;
+    address public constant multiSig = 0xa8F045c97BaB4AEF16B5e2d84DE16f581D1C7654; // set to my dev wallet for testing
 
     /** @dev BitVector to track used Evolution Rex tokens */
     mapping(uint256 => uint256) public usedEvolutionRexTokens;
@@ -37,12 +38,7 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         require(msg.sender == multiSig, "Only multisig");
         _;
     }
-    constructor(uint256 maxSupply_ , address evolutionRexContract_, address multiSig_) ERC721A("TheDarwins", "DRWN") {
-        require(evolutionRexContract_ != address(0), "Evolution Rex contract address cannot be zero");
-        require(multiSig_ != address(0), "MultiSig address cannot be zero");
-        maxSupply = maxSupply_;
-        evolutionRexContract = evolutionRexContract_;
-        multiSig = multiSig_;
+    constructor() ERC721A("TheDarwins", "DRWN") {
         _mintERC2309(msg.sender, 679); // Darwins 1 - 679 are reserved for giveaways
     }
     
