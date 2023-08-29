@@ -27,7 +27,6 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
     uint256 public constant BATCH_SIZE = 20;
 
     /** @dev Address of the Evolution Rex contract */
-    
     address public constant evolutionRexContract = 0x0D01Eaf7b57d95CC4DAF73A99b7916752aa6Fe15;
     address public constant multiSig = 0xa8F045c97BaB4AEF16B5e2d84DE16f581D1C7654; // set to my dev wallet for testing
 
