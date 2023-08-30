@@ -27,8 +27,8 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
     uint256 public immutable maxSupply = 10000;
     uint256 public constant BATCH_SIZE = 20;
 
-    address public constant evolutionRexContract = 0x0D01Eaf7b57d95CC4DAF73A99b7916752aa6Fe15;
-    address public constant multiSig = 0xa8F045c97BaB4AEF16B5e2d84DE16f581D1C7654; // set to my dev wallet for testing
+    address public constant EVOLUTION_REX_CONTRACT = 0x0D01Eaf7b57d95CC4DAF73A99b7916752aa6Fe15;
+    address public constant MULTI_SIG_WALLET = 0xa8F045c97BaB4AEF16B5e2d84DE16f581D1C7654; // set to my dev wallet for testing
     
 // mappings
     mapping(uint256 => uint256) public usedEvolutionRexTokens;
@@ -50,7 +50,7 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
     }
 
     modifier onlyMultiSig() {
-        require(msg.sender == multiSig, "Only multisig");
+        require(msg.sender == MULTI_SIG_WALLET, "Only multisig");
         _;
     }
 
@@ -99,7 +99,7 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         for (uint256 i = 0; i < tokenIds.length; i++) {
             uint256 tokenId = tokenIds[i];
             if (tokenId > 0 && tokenId <= maxSupply && !_isEvolutionRexTokenUsed(tokenId)) {
-                require(IERC721(evolutionRexContract).ownerOf(tokenId) == msg.sender, "Sender does not own token");
+                require(IERC721(EVOLUTION_REX_CONTRACT).ownerOf(tokenId) == msg.sender, "Sender does not own token");
                 _markEvolutionRexTokenUsed(tokenId);
             }
         }
@@ -122,6 +122,11 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
 
     function setBaseURI(string calldata _uri) external onlyOwner {
         _baseTokenURI = _uri;
+    }
+
+    // once trading skill is aquired, it cannot be revoked
+    function evolveTrading() external onlyOwner {
+        tradingSkill = true;
     }
 
     function setRexMintLive(bool isActive) external onlyOwner {
