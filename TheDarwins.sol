@@ -159,18 +159,8 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         }
     }
 
-    function estimateGasForMint(uint256 quantity) public pure returns (uint256) {
-        return _gasEstimateForMint(quantity);
-    }
 
 // internal functions
-
-    function _gasEstimateForMint(uint256 quantity) internal  pure returns (uint256) {
-        // TODO: Update this to be more accurate based on the actual gas usage of the mint function
-        uint256 gasUsage = 25000; // Base gas usage for minting
-        gasUsage += quantity * 30000; // Additional gas per minted token
-        return gasUsage;
-    }
 
     function _isEvolutionRexTokenUsed(uint256 tokenId) internal view returns (bool) {
         uint256 wordIndex = tokenId / 256;
