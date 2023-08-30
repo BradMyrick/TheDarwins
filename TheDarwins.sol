@@ -22,13 +22,19 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
     bool public tradingSkill = false;
     bool public rexMintLive = false;
     bool public paused = false;
+    // TODO: verifiy this is the correct max per wallet
     uint256 public maxPerWallet = 25;
-    uint256 public pricePerMint;
+    // TODO: if we are positive we won't update this, make it immutable
+    // and remove the setter function
+    uint256 public pricePerMint = 0.0069 ether;
+    // TODO: verify we don't want to be able to update this
     uint256 public immutable maxSupply = 10000;
+    // TODO verify this is the correct batch size
     uint256 public constant BATCH_SIZE = 20;
 
     address public constant EVOLUTION_REX_CONTRACT = 0x0D01Eaf7b57d95CC4DAF73A99b7916752aa6Fe15;
-    address public constant MULTI_SIG_WALLET = 0xa8F045c97BaB4AEF16B5e2d84DE16f581D1C7654; // set to my dev wallet for testing
+    // TODO: Update this to the correct multisig wallet address
+    address public constant MULTI_SIG_WALLET = 0xa8F045c97BaB4AEF16B5e2d84DE16f581D1C7654;
     
 // mappings
     mapping(uint256 => uint256) public usedEvolutionRexTokens;
@@ -57,7 +63,8 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
 // events
 
 // constructor
-    constructor() ERC721A("TheDarwins", "DRWN") {
+    constructor(string memory  uri) ERC721A("TheDarwins", "DRWN") {
+        _baseTokenURI = uri;
         _mintERC2309(msg.sender, 679); // Darwins 1 - 679 are reserved for giveaways
     }
     
@@ -154,6 +161,7 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
 // internal functions
 
     function _gasEstimateForMint(uint256 quantity) internal  pure returns (uint256) {
+        // TODO: Update this to be more accurate based on the actual gas usage of the mint function
         uint256 gasUsage = 25000; // Base gas usage for minting
         gasUsage += quantity * 30000; // Additional gas per minted token
         return gasUsage;
