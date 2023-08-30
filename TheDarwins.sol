@@ -2,9 +2,10 @@
 pragma solidity ^0.8.9;
 
 import "./ERC721A.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "./node_modules/@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "./node_modules/@openzeppelin/contracts/access/Ownable.sol";
+import "./node_modules/@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "./node_modules/@openzeppelin/contracts/utils/Strings.sol";
 
 /*
       __ ______  ____  ____        __  __  
@@ -75,6 +76,11 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
 
     function _baseURI() internal view virtual override returns (string memory) {
         return _baseTokenURI;
+    }
+
+    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+        require(_exists(tokenId), "Token does not exist");
+        return string(abi.encodePacked(_baseURI(), Strings.toString(tokenId), ".json"));
     }
 
     function setApprovalForAll(address operator, bool approved) public override tradingSkillAquired {
