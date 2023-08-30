@@ -29,8 +29,7 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
     uint256 public pricePerMint = 0.0069 ether;
     // TODO: verify we don't want to be able to update this
     uint256 public immutable maxSupply = 10000;
-    // TODO verify this is the correct batch size
-    uint256 public constant BATCH_SIZE = 20;
+
 
     address public constant EVOLUTION_REX_CONTRACT = 0x0D01Eaf7b57d95CC4DAF73A99b7916752aa6Fe15;
     // TODO: Update this to the correct multisig wallet address
