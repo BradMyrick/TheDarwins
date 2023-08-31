@@ -28,7 +28,7 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
 
     uint256 public pricePerMint = 0.0069 ether;
     uint256 public maxSupply = 10000;
-
+    uint256 public _wlMints = 0;
 
     // for testing using prev version deployment of this contract
     // TODO: Update this to the correct contract address
@@ -61,7 +61,8 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
     }
 
     modifier mintInsurance(uint256 price) {
-        require(address(this).balance >= (pricePerMint - price) * _totalMinted(), "Insufficient funds to refund difference");
+         
+        require(address(this).balance >= (pricePerMint - price) * (_totalMinted() - _wlMints), "Refund cannot be insured");
         _;
     }
 
@@ -121,6 +122,7 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         }
 
         // Mint the Darwins
+        _wlMints += tokenIds.length;
         _mint(msg.sender, tokenIds.length);
     }
 
@@ -129,8 +131,8 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         maxSupply = newMax;
     }
 
-    function pause(bool _paused) external onlyOwner {
-        paused = _paused;
+    function pause() external onlyOwner {
+        paused = !paused;
     }
 
     function getWhitelistMintedAmount(address wallet) public view returns (uint256) {
