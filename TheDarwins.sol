@@ -37,7 +37,7 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
     address public constant MULTI_SIG_WALLET = 0xa8F045c97BaB4AEF16B5e2d84DE16f581D1C7654;
     
 // mappings
-    mapping(uint256 => uint256) public usedEvolutionRexTokens;
+    mapping(uint256 => bool) public claimTokenUsed;
 
 // modifiers
     modifier tradingSkillAquired() {
@@ -115,9 +115,9 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
 
         for (uint256 i = 0; i < tokenIds.length; i++) {
             uint256 tokenId = tokenIds[i];
-            if (tokenId > 0 && tokenId <= maxSupply && !isClaimedTokenUsed(tokenId)) {
+            if (tokenId > 0 && tokenId <= maxSupply && claimTokenUsed[tokenId] == false) {
                 require(IERC721(WHITE_LISTED_CONTRACT).ownerOf(tokenId) == msg.sender, "Sender does not own token");
-                _markEvolutionRexTokenUsed(tokenId);
+                claimTokenUsed[tokenId] = true;
             }
         }
 
@@ -171,21 +171,6 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         for (uint256 i = 0; i < tokenIds.length; i++) {
             _burn(tokenIds[i], true); // with approval check
         }
-    }
-
-
-// internal functions
-
-    function isClaimedTokenUsed(uint256 tokenId) internal view returns (bool) {
-        uint256 wordIndex = tokenId / 256;
-        uint256 bitIndex = tokenId % 256;
-        return (usedEvolutionRexTokens[wordIndex] & (1 << bitIndex)) != 0;
-    }
-
-    function _markEvolutionRexTokenUsed(uint256 tokenId) internal {
-        uint256 wordIndex = tokenId / 256;
-        uint256 bitIndex = tokenId % 256;
-        usedEvolutionRexTokens[wordIndex] |= (1 << bitIndex);
     }
 
 
