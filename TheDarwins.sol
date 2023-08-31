@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.16;
 
-import "./ERC721A.sol";
+import "./node_modules/erc721a/contracts/ERC721A.sol";
 import "./node_modules/@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "./node_modules/@openzeppelin/contracts/access/Ownable.sol";
 import "./node_modules/@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -30,7 +30,9 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
     uint256 public maxSupply = 10000;
 
 
-    address public constant WHITE_LISTED_CONTRACT = 0x0D01Eaf7b57d95CC4DAF73A99b7916752aa6Fe15;
+    // for testing using prev version deployment of this contract
+    // TODO: Update this to the correct contract address
+    address public constant WHITE_LISTED_CONTRACT = 0xCc184d75B98667CFCC531835dCe5F76B118A486B;
     // TODO: Update this to the correct multisig wallet address
     address public constant MULTI_SIG_WALLET = 0xa8F045c97BaB4AEF16B5e2d84DE16f581D1C7654;
     
