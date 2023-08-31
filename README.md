@@ -1,61 +1,77 @@
-# Darwins NFT Contract
+# TheDarwins - NFT Contract
+
+Welcome to TheDarwins, an NFT contract for minting and managing unique Darwin-themed NFTs. This contract is powered by Ethereum and follows the Web3 standards. Below, you'll find all the information you need to understand and interact with this contract.
+
+![TheDarwins](https://i.imgur.com/xxxxxxxx.png)
+
+## Contract Details
+
+- **Contract Address**: [Contract Address](https://etherscan.io/address/YOUR_CONTRACT_ADDRESS)
+- **Token Name**: TheDarwins
+- **Token Symbol**: DRWN
+- **License**: MIT License
 
 ## Overview
 
-The Darwins NFT contract allows users to mint unique Darwins NFT tokens. It supports both public minting and minting with Evolution Rex tokens,
-utilizing the ERC721A base standard.
+TheDarwins is a unique NFT collection inspired by the world of Darwins. This contract allows you to mint these exclusive NFTs and perform various operations.
 
-## Features
+### Features
 
-- Public Minting: Users can mint Darwins NFT tokens by sending ETH.
-- Whitelist Minting with Evolution Rex Tokens: Users can mint Darwins NFT tokens by providing valid Evolution Rex tokens they own.
-- Gas Estimation: Estimate the gas required for minting Darwins NFT tokens.
-- Ownership and Control: The contract owner has control over configuration parameters.
+- **Minting**: Mint your own Darwin NFTs.
+- **Ownership**: Prove your skills and claim unique NFTs.
+- **MultiSig**: Securely manage contract funds with multisignature wallet support.
+- **Skills**: Evolve your skills to access exclusive features.
 
-## Smart Contract Details
+## Getting Started
 
-- **Base Contract**: This contract is based on the ERC721A standard, which includes batch minting functionality.
+### Installation
 
-- **Access Control**: Operational functions are restricted to the contract developer (`kodr.eth`). Withdrawal of ETH is restricted to the `multisig` wallet.
+To use this contract, you'll need Solidity 0.8.16. Make sure to install it before deploying the contract.
 
-- **Reentrancy Protection**: The contract uses ReentrancyGuard to prevent reentrancy attacks.
+### Usage
 
-- **Used Evolution Rex Tokens**: The contract keeps track of used Evolution Rex tokens to prevent double minting, without requiring the user to burn their tokens.
+#### Public Minting
 
-## Usage
+- Use the `publicMint` function to mint Darwin NFTs.
+- Ensure the contract is not paused and that you send enough Ether for the desired quantity of NFTs.
 
-- **Public Minting**: Users can mint Darwins NFT tokens by calling the `publicMint` function and sending ETH. The amount of ETH required is determined by the `pricePerMint` and `quantity` parameters.
+#### Private Minting
 
-- **Minting with Evolution Rex Tokens**: Users can mint Darwins NFT tokens by calling the `mintWithEvolutionRex` function and providing valid Evolution Rex tokens they own.
+- Use the `privateMint` function to mint NFTs that you own outside of this contract.
+- Make sure you are the owner of all tokens you intend to mint privately.
+
+#### Other Functions
+
+- Explore other functions like updating the max supply, setting the base URI, evolving your skills, and more.
+
+### Skills
+
+To access certain functions, you need to acquire specific skills:
+- **Trading Skill**: Required for some functions.
+- **Fire Skill**: Required for burning NFTs.
+
+### Multisig Wallet
+
+- The contract supports a multisignature wallet for secure fund management.
+
+## Contract Addresses
+
+- **White Listed Contract**: [White Listed Contract](https://etherscan.io/address/YOUR_WHITE_LISTED_CONTRACT)
+- **Multisig Wallet**: [Multisig Wallet](https://etherscan.io/address/YOUR_MULTISIG_WALLET)
 
 ## Configuration
 
-- **Whitelist Minting**: The contract owner can enable or disable whitelist minting using the `setWhitelistMintAvailable` function.
+- `pricePerMint`: Current price per mint.
+- `maxSupply`: Maximum number of Darwin NFTs.
+- `privMintLive` and `pubMintLive`: Control the availability of private and public mints.
+- `paused`: Pauses or unpauses contract operations.
 
-- **Public Minting Availability**: The contract owner can enable or disable public minting using the `setPublicMintAvailable` function.
+## Support
 
-- **Maximum Tokens per Wallet**: The maximum number of tokens that can be minted per wallet can be set using the `setMaxPerWallet` function.
-
-- **Base Token URI**: The base URI for token metadata can be set using the `setBaseURI` function.
-
-## Gas Estimation
-
-To estimate the gas required for minting Darwins NFT tokens, you can use the `estimateGasForMint` function, providing the desired quantity as a parameter.
-
-## Ownership and Control
-
-The contract owner has the ability to manage and configure the contract parameters. Ownership of the contract is `kodr.eth`.
-
-## Withdrawal
-
-Only the `multisig` wallet can withdraw ETH from the contract using the `withdraw` function. see `SafeWallet` contract for details.
+If you have any questions or need assistance, you can contact [kodr.eth](https://twitter.com/kodr.eth) for support.
 
 ## License
 
-This contract is released under the MIT License.
+This contract is released under the [MIT License](LICENSE).
 
-## Contact
-
-For any inquiries or assistance, please contact `kodr.eth` via [X.com](https://x.com/kodr_eth)
-```
-
+Enjoy collecting your Darwins! 🦖🌿
