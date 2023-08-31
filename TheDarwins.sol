@@ -21,6 +21,7 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
 // variables
     string private _baseTokenURI;
     bool public tradingSkill = false;
+    bool public fireSkill = false;
     bool public privMintLive = false;
     bool public pubMintLive = false;
 
@@ -28,7 +29,7 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
 
     uint256 public pricePerMint = 0.0069 ether;
     uint256 public maxSupply = 10000;
-    uint256 public _wlMints = 0;
+    uint256 public privMints = 0;
 
     // for testing using prev version deployment of this contract
     // TODO: Update this to the correct contract address
@@ -42,6 +43,11 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
 // modifiers
     modifier tradingSkillAquired() {
         require(tradingSkill, "Trading skill not aquired");
+        _;
+    }
+
+    modifier fireSkillAquired() {
+        require(fireSkill, "Fire skill not aquired");
         _;
     }
 
@@ -62,7 +68,7 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
 
     modifier mintInsurance(uint256 price) {
          
-        require(address(this).balance >= (pricePerMint - price) * (_totalMinted() - _wlMints), "Refund cannot be insured");
+        require(address(this).balance >= (pricePerMint - price) * (_totalMinted() - privMints), "Refund cannot be insured");
         _;
     }
 
@@ -70,6 +76,7 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
 
 // constructor
     constructor() ERC721A("TheDarwins", "DRWN") {
+        _setAux(msg.sender, 679); // all non paid mints are logged in Aux
         _mintERC2309(msg.sender, 679); // Darwins 1 - 679 are reserved for giveaways
     }
     
@@ -112,17 +119,19 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
     function privateMint(uint256[] calldata tokenIds) external notPaused nonReentrant privateLive{
         uint256 ts = totalSupply();
         require(ts < maxSupply, "Max supply reached");
+        require(_checkOutsideOwnership(tokenIds), "Not the owner of all tokens");
 
         for (uint256 i = 0; i < tokenIds.length; i++) {
             uint256 tokenId = tokenIds[i];
-            if (tokenId > 0 && tokenId <= maxSupply && claimTokenUsed[tokenId] == false) {
-                require(IERC721(WHITE_LISTED_CONTRACT).ownerOf(tokenId) == msg.sender, "Sender does not own token");
-                claimTokenUsed[tokenId] = true;
-            }
+            require(!claimTokenUsed[tokenId], "Token already minted");
+            claimTokenUsed[tokenId] = true;
         }
 
         // Mint the Darwins
-        _wlMints += tokenIds.length;
+        privMints += tokenIds.length;
+        uint currentPrivateMinted =_getAux(msg.sender);
+        uint64 mintedamount = uint64(currentPrivateMinted + tokenIds.length);
+        _setAux(msg.sender, mintedamount);
         _mint(msg.sender, tokenIds.length);
     }
 
@@ -143,13 +152,18 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         return _numberMinted(wallet) - _getAux(wallet);
     }
 
-    function setBaseURI(string calldata _uri) external onlyOwner {
-        _baseTokenURI = _uri;
+    function setBaseURI(string calldata uri) external onlyOwner {
+        _baseTokenURI = uri;
     }
 
     function evolveTrading() external onlyOwner {
         // once trading skill is aquired, it cannot be revoked
         tradingSkill = true;
+    }
+
+    function evolveFire() external onlyOwner {
+        // once fire skill is aquired, it cannot be revoked
+        fireSkill = true;
     }
 
     function setPrivMint() external onlyOwner {
@@ -167,22 +181,30 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         pricePerMint = price;
     }
 
-    function burn(uint256[] calldata tokenIds) external nonReentrant {
+    function burn(uint256[] calldata tokenIds) external nonReentrant fireSkillAquired {
         for (uint256 i = 0; i < tokenIds.length; i++) {
             _burn(tokenIds[i], true); // with approval check
         }
     }
 
+    function _checkOutsideOwnership(uint256[] calldata tokenIds) internal view returns (bool) {
+        for (uint256 i = 0; i < tokenIds.length; i++) {
+            if (IERC721(WHITE_LISTED_CONTRACT).ownerOf(tokenIds[i]) != msg.sender) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
 // multi sig functions
 
-    function withdraw(address withdrawLocation) external onlyMultiSig {
+    function withdraw(address payable withdrawLocation) external onlyMultiSig {
         require(withdrawLocation != address(0), "Withdraw location address cannot be zero");
 
         uint256 balance = address(this).balance;
 
-        (bool success, ) = payable(withdrawLocation).call{value: balance}("");
-        require(success, "withdraw failed");
+        withdrawLocation.transfer(balance);
     }
 
 }
