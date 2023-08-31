@@ -37,8 +37,9 @@ To use this contract, you'll need Solidity 0.8.16. Make sure to install it befor
 
 #### Private Minting
 
-- Use the `privateMint` function to mint NFTs that you own outside of this contract.
+- Use the `privateMint` function to mint for NFTs that you own of the `WHITE_LISTED_CONTRACT`.
 - Make sure you are the owner of all tokens you intend to mint privately.
+- Tokens can only be used for claiming once.
 
 #### Other Functions
 
@@ -61,14 +62,14 @@ To access certain functions, you need to acquire specific skills:
 
 ## Configuration
 
-- `pricePerMint`: Current price per mint.
+- `pricePerMint`: Price to mint a Darwin NFT.
 - `maxSupply`: Maximum number of Darwin NFTs.
 - `privMintLive` and `pubMintLive`: Control the availability of private and public mints.
 - `paused`: Pauses or unpauses contract operations.
 
 ## Support
 
-If you have any questions or need assistance, you can contact [kodr.eth](https://twitter.com/kodr.eth) for support.
+If you have any questions or need assistance, you can contact [kodr.eth](https://x.com/kodr_eth) for support.
 
 ## License
 
