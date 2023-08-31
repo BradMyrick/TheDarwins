@@ -21,18 +21,16 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
 // variables
     string private _baseTokenURI;
     bool public tradingSkill = false;
-    bool public rexMintLive = false;
+    bool public privMintLive = false;
+    bool public pubMintLive = false;
+
     bool public paused = false;
-    // TODO: verifiy this is the correct max per wallet
-    uint256 public maxPerWallet = 25;
-    // TODO: if we are positive we won't update this, make it immutable
-    // and remove the setter function
+
     uint256 public pricePerMint = 0.0069 ether;
-    // TODO: verify we don't want to be able to update this
-    uint256 public immutable maxSupply = 10000;
+    uint256 public maxSupply = 10000;
 
 
-    address public constant EVOLUTION_REX_CONTRACT = 0x0D01Eaf7b57d95CC4DAF73A99b7916752aa6Fe15;
+    address public constant WHITE_LISTED_CONTRACT = 0x0D01Eaf7b57d95CC4DAF73A99b7916752aa6Fe15;
     // TODO: Update this to the correct multisig wallet address
     address public constant MULTI_SIG_WALLET = 0xa8F045c97BaB4AEF16B5e2d84DE16f581D1C7654;
     
@@ -50,8 +48,8 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         _;
     }
 
-    modifier rexLive() {
-        require(rexMintLive, "Rex minting not live");
+    modifier privateLive() {
+        require(privMintLive, "Rex minting not live");
         _;
     }
 
@@ -60,11 +58,15 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         _;
     }
 
+    modifier mintInsurance(uint256 price) {
+        require(address(this).balance >= (pricePerMint - price) * _totalMinted(), "Insufficient funds to refund difference");
+        _;
+    }
+
 // events
 
 // constructor
-    constructor(string memory  uri) ERC721A("TheDarwins", "DRWN") {
-        _baseTokenURI = uri;
+    constructor() ERC721A("TheDarwins", "DRWN") {
         _mintERC2309(msg.sender, 679); // Darwins 1 - 679 are reserved for giveaways
     }
     
@@ -93,7 +95,7 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
     // public mint
     function publicMint(uint256 quantity) public payable notPaused nonReentrant {
         uint256 ts = totalSupply();
-        require(ts + quantity <= maxSupply && quantity <= maxPerWallet, "Max supply reached");
+        require(ts + quantity <= maxSupply, "Max supply reached");
 
         unchecked {
             require(msg.value == quantity * pricePerMint, "Insufficient funds to mint");
@@ -103,21 +105,26 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         _mint(msg.sender, quantity);
     }
 
-    // rex mint
-    function mintWithEvolutionRex(uint256[] calldata tokenIds) external notPaused nonReentrant rexLive{
+    // private mint
+    function privateMint(uint256[] calldata tokenIds) external notPaused nonReentrant privateLive{
         uint256 ts = totalSupply();
         require(ts < maxSupply, "Max supply reached");
 
         for (uint256 i = 0; i < tokenIds.length; i++) {
             uint256 tokenId = tokenIds[i];
-            if (tokenId > 0 && tokenId <= maxSupply && !_isEvolutionRexTokenUsed(tokenId)) {
-                require(IERC721(EVOLUTION_REX_CONTRACT).ownerOf(tokenId) == msg.sender, "Sender does not own token");
+            if (tokenId > 0 && tokenId <= maxSupply && !isClaimedTokenUsed(tokenId)) {
+                require(IERC721(WHITE_LISTED_CONTRACT).ownerOf(tokenId) == msg.sender, "Sender does not own token");
                 _markEvolutionRexTokenUsed(tokenId);
             }
         }
 
         // Mint the Darwins
         _mint(msg.sender, tokenIds.length);
+    }
+
+    function updateMaxSupply(uint256 newMax) external onlyOwner {
+        require(newMax > _totalMinted() , "New max must be greater than current supply");
+        maxSupply = newMax;
     }
 
     function pause(bool _paused) external onlyOwner {
@@ -136,20 +143,23 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         _baseTokenURI = _uri;
     }
 
-    // once trading skill is aquired, it cannot be revoked
     function evolveTrading() external onlyOwner {
+        // once trading skill is aquired, it cannot be revoked
         tradingSkill = true;
     }
 
-    function setRexMintLive(bool isActive) external onlyOwner {
-        rexMintLive = isActive;
+    function setPrivMint() external onlyOwner {
+        // if privMintLive is true, set to false, if false, set to true
+        privMintLive = !privMintLive;
+
     }
 
-    function setMaxPerWallet(uint256 _maxPerWallet) external onlyOwner {
-        maxPerWallet = _maxPerWallet;
+    function setPubMint() external onlyOwner {
+        // if pubMintLive is true, set to false, if false, set to true
+        pubMintLive = !pubMintLive;
     }
 
-    function setPricePerMint(uint256 price) external onlyOwner {
+    function updatePricePerMint(uint256 price) external onlyOwner mintInsurance(price) {
         pricePerMint = price;
     }
 
@@ -162,7 +172,7 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
 
 // internal functions
 
-    function _isEvolutionRexTokenUsed(uint256 tokenId) internal view returns (bool) {
+    function isClaimedTokenUsed(uint256 tokenId) internal view returns (bool) {
         uint256 wordIndex = tokenId / 256;
         uint256 bitIndex = tokenId % 256;
         return (usedEvolutionRexTokens[wordIndex] & (1 << bitIndex)) != 0;
