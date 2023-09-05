@@ -3,4 +3,8 @@
 *.config
 package-lock.json
 package.json
+*.json
+merkle.py
+merkle-root.txt
+merkle-proofs.json
 ```

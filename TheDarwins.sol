@@ -30,7 +30,7 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
 
     uint256 public pricePerMint = 0.0069 ether;
     uint256 public maxSupply = 10000;
-    uint256 public privMints = 0;
+    uint256 public privMints;
 
     bytes32 private root;
 
@@ -70,24 +70,17 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         _;
     }
 
-    modifier mintInsurance(uint256 price) {
-        require(
-            address(this).balance >=
-                (pricePerMint - price) * (_totalMinted() - privMints),
-            "Refund cannot be insured"
-        );
-        _;
-    }
-
     modifier wlCheck(
         bytes32[] memory proof,
-        uint256 originalAmount,
-        uint256 amountToMint
+        uint64 originalAmount,
+        uint64 amountToMint
     ) {
         bytes32 leaf = keccak256(abi.encodePacked(msg.sender, originalAmount));
         require(MerkleProof.verify(proof, root, leaf), "Invalid proof");
-        uint256 minted = _numberMinted(msg.sender);
+        uint256 minted = _getAux(msg.sender);
         require(minted + amountToMint <= originalAmount, "Max mint reached");
+        // update the amount minted by the wallet
+        _updateWhitelistMintedAmount(msg.sender, amountToMint);
         _;
     }
 
@@ -95,8 +88,8 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
 
     // constructor
     constructor() ERC721A("TheDarwins", "DRWN") {
-        _setAux(msg.sender, 679); // all non paid mints are logged in Aux
-        _mintERC2309(msg.sender, 679); // Darwins 1 - 679 are reserved for giveaways
+        privMints = 50;
+        _mintERC2309(msg.sender, 50); // Darwins 1 - 50 are reserved for giveaways
     }
 
     // override functions
@@ -143,8 +136,8 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
     // private mint
     function privateMint(
         bytes32[] calldata merkleProof,
-        uint64 amountToMint,
-        uint256 originalAmount
+        uint64 originalAmount,
+        uint64 amountToMint
     )
         external
         notPaused
@@ -152,12 +145,10 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         privateLive
         wlCheck(merkleProof, originalAmount, amountToMint)
     {
-        uint256 ts = totalSupply();
-        require(ts < maxSupply, "Max supply reached");
+        privMints += amountToMint;
         // Mint the Darwins
         _mint(msg.sender, amountToMint);
-        // Update the amount minted by the wallet
-        _updateWhitelistMintedAmount(msg.sender, amountToMint);
+        
     }
 
     function updateMaxSupply(uint256 newMax) external onlyOwner {
@@ -217,7 +208,7 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
 
     function updatePricePerMint(
         uint256 price
-    ) external onlyOwner mintInsurance(price) {
+    ) external onlyOwner {
         pricePerMint = price;
     }
 
@@ -229,8 +220,9 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         }
     }
 
-    function setMerkleRoot(bytes32 _merkleRoot) external onlyOwner {
-        root = _merkleRoot;
+    function setMerkleRoot(string calldata _merkleRoot) external onlyOwner {
+        // convert string to bytes32
+        root = bytes32(bytes(_merkleRoot));
     }
 
     // multi sig functions
