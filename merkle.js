@@ -22,6 +22,7 @@ parse(contentWithoutBOM, {
     const merkleTree = StandardMerkleTree.of(values, ["address", "uint256"]);
 
     console.log("Merkle root:", merkleTree.root);
-
+    console.log(merkleTree.render());
     fs.writeFileSync("merkleTree.json", JSON.stringify(merkleTree.dump()));
+
 });
