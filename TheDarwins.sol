@@ -34,10 +34,6 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
 
     bytes32 private root;
 
-    // for testing using prev version deployment of this contract
-    // TODO: Update this to the correct contract address
-    address public constant WHITE_LISTED_CONTRACT =
-        0xCc184d75B98667CFCC531835dCe5F76B118A486B;
     // TODO: Update this to the correct multisig wallet address
     address public constant MULTI_SIG_WALLET =
         0xa8F045c97BaB4AEF16B5e2d84DE16f581D1C7654;
