@@ -1,19 +1,19 @@
-# TheDarwins - NFT Contract
+## TheDarwins - NFT Contract
 
 Welcome to TheDarwins, an NFT contract for minting and managing unique Darwin-themed NFTs. This contract is powered by Ethereum and follows the Web3 standards. Below, you'll find all the information you need to understand and interact with this contract.
 
-![TheDarwins](https://i.imgur.com/xxxxxxxx.png)
+TheDarwins
 
 ## Contract Details
 
-- **Contract Address**: [Contract Address](https://etherscan.io/address/YOUR_CONTRACT_ADDRESS)
+- **Contract Address**: [Contract Address](https://etherscan.io/address/OUR_CONTRACT_ADDRESS)
 - **Token Name**: TheDarwins
 - **Token Symbol**: DRWN
 - **License**: MIT License
 
 ## Overview
 
-TheDarwins is a unique NFT collection inspired by the world of Darwins. This contract allows you to mint these exclusive NFTs and perform various operations.
+TheDarwins is a unique NFT collection inspired by the evolution of humanity through time. This contract allows you to mint these exclusive NFTs and perform various operations.
 
 ### Features
 
@@ -57,8 +57,8 @@ To access certain functions, you need to acquire specific skills:
 
 ## Contract Addresses
 
-- **White Listed Contract**: [White Listed Contract](https://etherscan.io/address/YOUR_WHITE_LISTED_CONTRACT)
-- **Multisig Wallet**: [Multisig Wallet](https://etherscan.io/address/YOUR_MULTISIG_WALLET)
+- **White Listed Contract**: [White Listed Contract](https://etherscan.io/address/WHITE_LISTED_CONTRACT)
+- **Multisig Wallet**: [Multisig Wallet](https://etherscan.io/address/OUR_MULTISIG_WALLET)
 
 ## Configuration
 
@@ -66,6 +66,15 @@ To access certain functions, you need to acquire specific skills:
 - `maxSupply`: Maximum number of Darwin NFTs.
 - `privMintLive` and `pubMintLive`: Control the availability of private and public mints.
 - `paused`: Pauses or unpauses contract operations.
+
+## Resources
+
+To better understand NFTs and smart contract security, consider the following resources:
+
+1. [Anatomy of an NFT: A Guide to NFT Analysis](https://www.ledger.com/academy/anatomy-of-an-nft-a-guide-to-nft-analysis)
+2. [NFT Smart Contract Audit: Ultimate Guide for Founders and Managers](https://hacken.io/discover/security-audit-for-nft-guide-for-founders-and-managers/)
+3. [NFT Security 101. An example-based analysis](https://medium.com/geekculture/nft-security-101-bc19e689e27b)
+4. [How to Secure NFTs: Part Two - NFT Smart Contract Security](https://www.certik.com/resources/blog/1Kl3XHKDdzIZvW0dyJLuSu-how-to-secure-nfts-part-two-nft-smart-contract-security)
 
 ## Support
 

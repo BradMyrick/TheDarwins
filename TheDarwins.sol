@@ -8,16 +8,6 @@ import "./node_modules/@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./node_modules/@openzeppelin/contracts/utils/Strings.sol";
 import "./node_modules/@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
-/*
-      __ ______  ____  ____        __  __  
-     / //_/ __ \/ __ \/ __ \ ___  / /_/ /_ 
-    / ,< / / / / / / / /_/ // _ \/ __/ __ \
-   / /| / /_/ / /_/ / _, _//  __/ /_/ / / /
-  /_/ |_\____/_____/_/ |_(_)___/\__/_/ /_/ 
-  
-  @dev: kodr.eth
-*/
-
 contract Darwins is ERC721A, Ownable, ReentrancyGuard {
     // variables
     string private _baseTokenURI;
@@ -34,11 +24,8 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
 
     bytes32 private root;
 
-    // TODO: Update this to the correct multisig wallet address
     address public constant MULTI_SIG_WALLET =
-        0xa8F045c97BaB4AEF16B5e2d84DE16f581D1C7654;
-
-    // mappings
+        0x07133dec805C3ED394Fb141f410f32fb407Bec16;
 
     // modifiers
     modifier tradingSkillAquired() {
@@ -80,8 +67,6 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         _;
     }
 
-    // events
-
     // constructor
     constructor() ERC721A("TheDarwins", "DRWN") {
         privMints = 50;
@@ -116,7 +101,6 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
 
     // public functions
 
-    // public mint
     function publicMint(
         uint256 quantity
     ) external payable notPaused nonReentrant {
@@ -129,7 +113,6 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         _mint(msg.sender, quantity);
     }
 
-    // private mint
     function privateMint(
         bytes32[] calldata merkleProof,
         uint64 originalAmount,
@@ -142,7 +125,6 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         wlCheck(merkleProof, originalAmount, amountToMint)
     {
         privMints += amountToMint;
-        // Mint the Darwins
         _mint(msg.sender, amountToMint);
         
     }
@@ -193,12 +175,10 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
     }
 
     function setPrivMint() external onlyOwner {
-        // if privMintLive is true, set to false, if false, set to true
         privMintLive = !privMintLive;
     }
 
     function setPubMint() external onlyOwner {
-        // if pubMintLive is true, set to false, if false, set to true
         pubMintLive = !pubMintLive;
     }
 
@@ -212,16 +192,13 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         uint256[] calldata tokenIds
     ) external nonReentrant fireSkillAquired {
         for (uint256 i = 0; i < tokenIds.length; i++) {
-            _burn(tokenIds[i], true); // with approval check
+            _burn(tokenIds[i], true);
         }
     }
 
     function setMerkleRoot(string calldata _merkleRoot) external onlyOwner {
-        // convert string to bytes32
         root = bytes32(bytes(_merkleRoot));
     }
-
-    // multi sig functions
 
     function withdraw(address payable withdrawLocation) external onlyMultiSig {
         require(
