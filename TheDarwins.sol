@@ -2,11 +2,20 @@
 pragma solidity ^0.8.16;
 
 import "./node_modules/erc721a/contracts/ERC721A.sol";
-import "./node_modules/@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "./node_modules/@openzeppelin/contracts/access/Ownable.sol";
 import "./node_modules/@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./node_modules/@openzeppelin/contracts/utils/Strings.sol";
 import "./node_modules/@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+
+/*
+      __ ______  ____  ____        __  __  
+     / //_/ __ \/ __ \/ __ \ ___  / /_/ /_ 
+    / ,< / / / / / / / /_/ // _ \/ __/ __ \
+   / /| / /_/ / /_/ / _, _//  __/ /_/ / / /
+  /_/ |_\____/_____/_/ |_(_)___/\__/_/ /_/ 
+  
+  @dev: kodr.eth
+*/
 
 contract Darwins is ERC721A, Ownable, ReentrancyGuard {
     // variables
@@ -24,7 +33,7 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
 
     bytes32 private root;
 
-    address public constant MULTI_SIG_WALLET =
+    address public MULTI_SIG_WALLET =
         0x07133dec805C3ED394Fb141f410f32fb407Bec16;
 
     // modifiers
@@ -62,15 +71,16 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         require(MerkleProof.verify(proof, root, leaf), "Invalid proof");
         uint256 minted = _getAux(msg.sender);
         require(minted + amountToMint <= originalAmount, "Max mint reached");
-        // update the amount minted by the wallet
         _updateWhitelistMintedAmount(msg.sender, amountToMint);
         _;
     }
 
     // constructor
     constructor() ERC721A("TheDarwins", "DRWN") {
-        privMints = 50;
-        _mintERC2309(msg.sender, 50); // Darwins 1 - 50 are reserved for giveaways
+        _baseTokenURI = "https://darwins.app/metadata/";
+        // Darwins 1 - 500 are reserved for giveaways
+        _updateWhitelistMintedAmount(MULTI_SIG_WALLET, 500); 
+        _mintERC2309(MULTI_SIG_WALLET, 500);
     }
 
     // override functions
@@ -124,7 +134,6 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         privateLive
         wlCheck(merkleProof, originalAmount, amountToMint)
     {
-        privMints += amountToMint;
         _mint(msg.sender, amountToMint);
         
     }
@@ -151,6 +160,7 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         address wallet,
         uint64 amount
     ) internal {
+        privMints += amount;
         _setAux(wallet, _getAux(wallet) + amount);
     }
 
@@ -209,5 +219,14 @@ contract Darwins is ERC721A, Ownable, ReentrancyGuard {
         uint256 balance = address(this).balance;
 
         withdrawLocation.transfer(balance);
+    }
+
+    function updateMultiSig(address newMultiSig) external onlyMultiSig {
+        require(
+            newMultiSig != address(0),
+            "MultiSig address cannot be zero"
+        );
+
+        MULTI_SIG_WALLET = newMultiSig;
     }
 }
